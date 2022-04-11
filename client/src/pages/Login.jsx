@@ -1,6 +1,7 @@
-import { Button, FormGroup, InputGroup, Callout} from '@blueprintjs/core'
-import React, {useState, useContext} from 'react'
-import { UserContext} from '../context/UserContext'
+import { Button, FormGroup, InputGroup, Callout, Divider } from '@blueprintjs/core'
+import React, { useState, useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { UserContext } from '../context/UserContext'
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -9,6 +10,7 @@ const Login = () => {
     const [error, setError] = useState("")
 
     const [userContext, setUserContext] = useContext(UserContext)
+    const navigate = useNavigate()
 
     // useEffect(() => console.log(userContext), [userContext])
 
@@ -17,12 +19,13 @@ const Login = () => {
         setIsSubmitting(true)
         setError("")
 
-        fetch(process.env.REACT_APP_API_ENDPOINT + "users/login", {
+        fetch(process.env.REACT_APP_API_ENDPOINT + "api/v1/auth/signin", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: email, password }),
+            body: JSON.stringify({ email, password }),
             credentials: "include"
         }).then( async response => {
+
             setIsSubmitting(false)
             if(!response.ok){
                 if(response.status === 400){
@@ -34,7 +37,8 @@ const Login = () => {
                 }
             }else{
                 const data = await response.json()
-                setUserContext(prev => ({ ...prev, token: data.token }))
+                setUserContext(prev => ({ ...prev, token: data.token, ...data }))
+                navigate('/')
             }
         }).catch(error => {
             setIsSubmitting(false)
@@ -69,7 +73,10 @@ const Login = () => {
                     fill
                     loading={isSubmitting}
                     type="submit" 
-                    text="Sign In" />
+                    text="Sign In" 
+                />
+                <Divider />
+                <Link to="/forgot">Forgot Password?</Link>
             </form>
         </>
     )
