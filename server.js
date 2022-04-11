@@ -6,10 +6,11 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 
+
 app.use(cors())
 app.use(express.json())
 
-app.use('/api/v1')
+app.use('/api/v1', require('./routes/index'))
 
 app.use((error, req,res,next) => {
     res.status(500).json({error:error.message}
